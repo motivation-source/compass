@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Compass · A coaching companion for work & life</title>
+<meta name="description" content="A structured space to think through career and life questions with care." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='42' fill='none' stroke='%232d6862' stroke-width='4'/%3E%3Cpath d='M50 18 L56 50 L50 82 L44 50 Z' fill='%23c08561'/%3E%3C/svg%3E" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo" id="logo-home">
+      <svg class="logo-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M20 6 L23 20 L20 34 L17 20 Z" fill="currentColor"/>
+        <circle cx="20" cy="20" r="2" fill="var(--paper)"/>
+      </svg>
+      <span class="logo-text">Compass</span>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" data-view="home">Home</button>
+      <button class="nav-btn" data-view="history">History</button>
+      <button class="nav-btn" id="settings-btn" title="Settings">⚙</button>
+    </nav>
+  </header>
+
+  <!-- HOME VIEW -->
+  <section id="view-home" class="view">
+    <div class="hero">
+      <p class="eyebrow">A coaching companion</p>
+      <h1 class="hero-title">Think more clearly about <em>work</em> and <em>life</em>.</h1>
+      <p class="hero-sub">Compass walks you through the questions a thoughtful coach would ask — for the decision you're sitting with, the situation you can't shake, or the future you want to design.</p>
+    </div>
+
+    <div class="mode-grid mode-grid-three">
+      <button class="mode-card" data-mode="navigate">
+        <div class="mode-icon">◈</div>
+        <h2 class="mode-title">Navigate a situation</h2>
+        <p class="mode-desc">Pick a specific situation — a job decision, a conflict, burnout, a stuck feeling — and walk through 6–7 thoughtful questions. End with a synthesis.</p>
+        <span class="mode-meta">10–20 minutes · offline</span>
+      </button>
+      <button class="mode-card mode-card-featured" data-mode="chat">
+        <div class="mode-icon">🗣</div>
+        <h2 class="mode-title">Talk it through</h2>
+        <p class="mode-desc">A live conversation with a coach who asks follow-up questions, listens carefully, and stays grounded in what you actually told them. Bring your own API key.</p>
+        <span class="mode-meta">open-ended · uses Groq</span>
+      </button>
+      <button class="mode-card" data-mode="daily">
+        <div class="mode-icon">◉</div>
+        <h2 class="mode-title">Daily reflection</h2>
+        <p class="mode-desc">A short check-in for self-awareness over time. What's alive for you today, what mattered yesterday, what you're choosing to focus on.</p>
+        <span class="mode-meta">3 minutes · offline</span>
+      </button>
+    </div>
+
+    <div class="home-footer">
+      <p>Your sessions are saved on this device only. The structured modes never leave your browser; the chat mode sends only your messages to Groq.</p>
+    </div>
+  </section>
+
+  <!-- SCENARIO PICKER VIEW -->
+  <section id="view-pick" class="view hidden">
+    <div class="view-header">
+      <button class="back-btn" data-back="home">← Back</button>
+      <h2 class="view-title">What are you working through?</h2>
+      <p class="view-sub">Pick the closest match. You can also start one to see if it fits — nothing is committed until you complete it.</p>
+    </div>
+    <div id="scenario-list" class="scenario-list"></div>
+  </section>
+
+  <!-- SESSION VIEW -->
+  <section id="view-session" class="view hidden">
+    <div class="session-header">
+      <button class="back-btn" data-back="pick">← Back</button>
+      <div class="session-meta">
+        <span id="session-title" class="session-title"></span>
+        <div class="progress">
+          <div id="progress-fill" class="progress-fill"></div>
+        </div>
+        <span id="step-counter" class="step-counter"></span>
+      </div>
+    </div>
+    <div class="session-body">
+      <h2 id="step-title" class="step-title"></h2>
+      <p id="step-prompt" class="step-prompt"></p>
+      <textarea id="step-input" class="step-input" rows="6" placeholder="Take your time. No one else reads this."></textarea>
+      <p id="autosave-hint" class="autosave-hint">Saved automatically as you type.</p>
+      <div class="session-nav">
+        <button id="prev-btn" class="btn-secondary">← Previous</button>
+        <button id="next-btn" class="btn-primary">Next →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- SYNTHESIS VIEW -->
+  <section id="view-synthesis" class="view hidden">
+    <div class="view-header">
+      <button class="back-btn" data-back="home">← Home</button>
+      <p class="eyebrow" id="synth-eyebrow">Session complete</p>
+      <h2 class="view-title" id="synth-title"></h2>
+    </div>
+
+    <div class="synth-section">
+      <h3 class="synth-h3">Your reflection, reflected back</h3>
+      <div id="synth-answers" class="synth-answers"></div>
+    </div>
+
+    <div class="synth-section">
+      <h3 class="synth-h3">A framework that may help</h3>
+      <div id="synth-frameworks" class="synth-frameworks"></div>
+    </div>
+
+    <div class="synth-section" id="synth-patterns-section">
+      <h3 class="synth-h3">What stood out in what you wrote</h3>
+      <div id="synth-patterns" class="synth-patterns"></div>
+    </div>
+
+    <div class="synth-section">
+      <h3 class="synth-h3">Concrete next steps</h3>
+      <div id="synth-actions" class="synth-actions"></div>
+    </div>
+
+    <div class="synth-actions-row" id="synth-actions-row">
+      <button id="copy-session" class="btn-secondary">Copy session as text</button>
+      <button id="new-session" class="btn-primary">Start another</button>
+    </div>
+  </section>
+
+  <!-- DAILY REFLECTION VIEW -->
+  <section id="view-daily" class="view hidden">
+    <div class="view-header">
+      <button class="back-btn" data-back="home">← Back</button>
+      <p class="eyebrow">Daily reflection</p>
+      <h2 class="view-title">A quiet three minutes</h2>
+    </div>
+    <div class="daily-body">
+      <div class="daily-prompt">
+        <h3>What's on top for you right now?</h3>
+        <textarea data-daily="top" class="step-input" rows="3" placeholder="A feeling, a worry, a thought you can't shake, something good..."></textarea>
+      </div>
+      <div class="daily-prompt">
+        <h3>One good thing from yesterday</h3>
+        <textarea data-daily="good" class="step-input" rows="2" placeholder="Something small counts."></textarea>
+      </div>
+      <div class="daily-prompt">
+        <h3>The one thing that matters most today</h3>
+        <textarea data-daily="focus" class="step-input" rows="2" placeholder="If only one thing got done today, it would be..."></textarea>
+      </div>
+      <div class="daily-prompt">
+        <h3>How are you, really? <span class="mood-label">(1 = struggling, 10 = great)</span></h3>
+        <div class="mood-scale" id="mood-scale"></div>
+      </div>
+      <button id="daily-save" class="btn-primary">Save reflection</button>
+    </div>
+  </section>
+
+  <!-- HISTORY VIEW -->
+  <section id="view-history" class="view hidden">
+    <div class="view-header">
+      <button class="back-btn" data-back="home">← Back</button>
+      <h2 class="view-title">Your sessions</h2>
+      <p class="view-sub">Everything you've worked through. Tap any to revisit.</p>
+    </div>
+    <div id="history-list" class="history-list"></div>
+  </section>
+
+  <!-- API KEY SETUP VIEW -->
+  <section id="view-key-setup" class="view hidden">
+    <div class="view-header">
+      <button class="back-btn" data-back="home">← Back</button>
+      <p class="eyebrow">One-time setup</p>
+      <h2 class="view-title">Add your Groq API key</h2>
+      <p class="view-sub">The chat mode uses Groq's free Llama API to power conversations. You'll need a key, which you get for free.</p>
+    </div>
+
+    <div class="setup-card">
+      <ol class="setup-steps">
+        <li>Go to <a href="https://console.groq.com" target="_blank" rel="noopener">console.groq.com</a> and sign in (free, no credit card)</li>
+        <li>In the left sidebar, click <strong>API Keys</strong></li>
+        <li>Click <strong>Create API Key</strong>, name it anything, and submit</li>
+        <li>Copy the key (starts with <code>gsk_</code>) — it's only shown once</li>
+        <li>Paste it below</li>
+      </ol>
+
+      <label for="api-key-input" class="key-label">Your Groq API key</label>
+      <input id="api-key-input" type="password" class="key-input" placeholder="gsk_..." autocomplete="off" spellcheck="false" />
+      <p id="key-error" class="key-error hidden"></p>
+
+      <button id="save-key-btn" class="btn-primary">Save and continue</button>
+
+      <p class="key-note">Your key is stored only in this browser, in <code>localStorage</code>. It's never sent anywhere except to Groq when you chat. You can remove or change it any time from the ⚙ menu.</p>
+    </div>
+  </section>
+
+  <!-- CHAT VIEW -->
+  <section id="view-chat" class="view hidden">
+    <div class="chat-header">
+      <button class="back-btn" data-back="home">← Home</button>
+      <div class="chat-header-info">
+        <span class="chat-header-title">Talk it through</span>
+        <span class="chat-header-sub" id="chat-model-label">llama-3.3-70b</span>
+      </div>
+      <button id="end-chat-btn" class="btn-secondary btn-small">End</button>
+    </div>
+
+    <div id="chat-messages" class="chat-messages"></div>
+
+    <div class="chat-input-area">
+      <textarea id="chat-input" class="chat-input" rows="1" placeholder="What's on your mind?"></textarea>
+      <button id="chat-send-btn" class="chat-send-btn" title="Send">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- SETTINGS MODAL -->
+  <div id="settings-modal" class="modal hidden">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content">
+      <button class="modal-close" data-close-modal>✕</button>
+      <h3 class="modal-title">Settings</h3>
+
+      <div class="settings-section">
+        <h4 class="settings-label">Groq API key</h4>
+        <p class="settings-desc" id="key-status">Not set.</p>
+        <div class="settings-actions">
+          <button id="update-key-btn" class="btn-secondary btn-small">Update key</button>
+          <button id="clear-key-btn" class="btn-secondary btn-small btn-danger">Remove key</button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-label">Model</h4>
+        <select id="model-select" class="settings-select">
+          <option value="llama-3.3-70b-versatile">Llama 3.3 70B (recommended)</option>
+          <option value="openai/gpt-oss-120b">GPT-OSS 120B (newer)</option>
+          <option value="llama-3.1-8b-instant">Llama 3.1 8B (fastest)</option>
+        </select>
+      </div>
+
+      <div class="settings-section">
+        <h4 class="settings-label">Clear all data</h4>
+        <p class="settings-desc">Removes all saved sessions, daily reflections, chats, and your API key from this browser.</p>
+        <button id="clear-all-btn" class="btn-secondary btn-small btn-danger">Clear everything</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="data.js"></script>
+<script src="chat.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
